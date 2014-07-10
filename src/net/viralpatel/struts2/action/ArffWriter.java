@@ -7,135 +7,194 @@ import java.io.IOException;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.List;
 
 public class ArffWriter {
 
 	public static List<String> MOTS_DROLES;
 	public static List<String> SMILEYS;
+	public static List<String> SMILEYSCONTENT;
+	public static List<String> SMILEYSPASCONTENT;
 	public static List<String> ARGOT_TWITTER;
 	public static List<String> PONCTUATION;
-
+	public static List<String> ATTRIBUTS;
+	public static List<String> ATTRIBUTS_FILE;
+	public static int NOMBREATTRIBUTS;
 
 	public ArffWriter() {
 	}
 
-
 	private void init() {
 		try {
-			MOTS_DROLES = Files.readAllLines(
-					Paths.get("/home/alexis/git/WebTweetDrole/input/listeMotsHumour.txt"),
-					Charset.forName("UTF-8"));
-			SMILEYS = Files.readAllLines(Paths.get("/home/alexis/git/WebTweetDrole/input/listeSmileys.txt"),
-					Charset.forName("UTF-8"));
-			ARGOT_TWITTER = Files.readAllLines(
-					Paths.get("/home/alexis/git/WebTweetDrole/input/listeArgotTwitter.txt"),
-					Charset.forName("UTF-8"));
-			PONCTUATION = Files.readAllLines(
-					Paths.get("/home/alexis/git/WebTweetDrole/input/listePonctuation.txt"),
-					Charset.forName("UTF-8"));
+			MOTS_DROLES = Files
+					.readAllLines(
+							Paths.get("/home/alexis/git/WebTweetDrole/input/listeMotsHumour.txt"),
+							Charset.forName("UTF-8"));
+			SMILEYS = Files
+					.readAllLines(
+							Paths.get("/home/alexis/git/WebTweetDrole/input/listeSmileys.txt"),
+							Charset.forName("UTF-8"));
+			ARGOT_TWITTER = Files
+					.readAllLines(
+							Paths.get("/home/alexis/git/WebTweetDrole/input/listeArgotTwitter.txt"),
+							Charset.forName("UTF-8"));
+			PONCTUATION = Files
+					.readAllLines(
+							Paths.get("/home/alexis/git/WebTweetDrole/input/listePonctuation.txt"),
+							Charset.forName("UTF-8"));
+			ATTRIBUTS_FILE = Files
+					.readAllLines(
+							Paths.get("/home/alexis/git/WebTweetDrole/input/corpusTweetTest.arff"),
+							Charset.forName("UTF-8"));
+			SMILEYSCONTENT = Files
+					.readAllLines(
+							Paths.get("/home/alexis/git/WebTweetDrole/input/listeSmileysContents.txt"),
+							Charset.forName("UTF-8"));
+			SMILEYSPASCONTENT = Files
+					.readAllLines(
+							Paths.get("/home/alexis/git/WebTweetDrole/input/listeSmileysPasContents.txt"),
+							Charset.forName("UTF-8"));
+
+			ATTRIBUTS = new ArrayList<String>();
+			for (String s : ATTRIBUTS_FILE) {
+				if (s.contains("@ATTRIBUTE")) {
+					String[] nomAttr = s.split(" ");
+					ATTRIBUTS.add(nomAttr[1]);
+				}
+			}
+			for (int i = 0; i <= 8; i++) {
+				ATTRIBUTS.remove(ATTRIBUTS.size() - 1);
+			}
 
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
 	}
 
-	public StringBuilder processListeTweets(Tweet t) {
-		
+	public void processListeTweets(List<Tweet> t) throws IOException {
+
 		init();
-		
-		StringBuilder arffContent = new StringBuilder();
 
-		// arffContent.append("@RELATION tweet\n\n");
-		// arffContent.append("@ATTRIBUTE user {true,false}\n");
-		// arffContent.append("@ATTRIBUTE word {true,false}\n");
-		// arffContent.append("@ATTRIBUTE hashtag {true,false}\n");
-		// arffContent.append("@ATTRIBUTE smiley {true,false}\n");
-		// arffContent.append("@ATTRIBUTE argoInternet {true,false}\n");
-		// arffContent
-		// .append("@ATTRIBUTE ponctuation {absent, regulier, surnombre}\n");
-		// arffContent.append("@ATTRIBUTE retweet {true,false}\n");
-		// arffContent.append("@ATTRIBUTE nbRetweet NUMERIC\n");
-		// arffContent.append("@ATTRIBUTE longeur NUMERIC\n");
-		// arffContent.append("@ATTRIBUTE tweetDrole {true,false}\n\n");
-		// arffContent.append("@DATA\n");
+		String arffContent = "";
 
-			processUserAttribute(arffContent, t);
-			processWordAttribute(arffContent, t);
-			processHashtagAttribute(arffContent, t);
-			processSmileyAttribute(arffContent, t);
-			processArgotAttribute(arffContent, t);
-			processPonctuationAttribute(arffContent, t);
-			processRetweetAttribute(arffContent, t);
-			processNbRetweetAttribute(arffContent, t);
-			processLongeurAttribute(arffContent, t);
-			processTweetDroleAttribute(arffContent, t);
+		List<String> temp = Files.readAllLines(Paths
+				.get("/home/alexis/git/WebTweetDrole/input/outputTemp.arff"),
+				Charset.forName("UTF-8"));
 
+		for (String s : temp) {
+			arffContent += s + "\n";
+		}
 
-		return arffContent;
+		for (Tweet tweet : t) {
+			NOMBREATTRIBUTS = 0;
+			arffContent += "{";
+
+			for (String attr : ATTRIBUTS) {
+				if (tweet.getText().contains(attr)) {
+					arffContent += NOMBREATTRIBUTS + " 1,";
+				}
+				NOMBREATTRIBUTS++;
+			}
+
+			arffContent += processHashtagAttribute(arffContent, tweet);
+			arffContent += processSmileyPasContentAttribute(arffContent, tweet);
+			arffContent += processSmileyContentAttribute(arffContent, tweet);
+			arffContent += processPonctuationAttribute(arffContent, tweet);
+			arffContent += processRetweetAttribute(arffContent, tweet);
+			arffContent += processNbRetweetAttribute(arffContent, tweet);
+			arffContent += processLongeurAttribute(arffContent, tweet);
+			arffContent += processNbMotsAttribute(arffContent, tweet);
+			arffContent += processDroleAttribute(arffContent, tweet);
+
+		}
+
+		File file = new File(
+				"/home/alexis/git/WebTweetDrole/input/outputReaded.arff");
+		// if file doesnt exists, then create it
+		if (!file.exists()) {
+			file.createNewFile();
+		}
+		FileWriter fw = new FileWriter(file.getAbsoluteFile());
+		BufferedWriter bw = new BufferedWriter(fw);
+		bw.write(arffContent);
+		bw.close();
+
 	}
 
-	private void processLongeurAttribute(StringBuilder arffContent, Tweet t) {
-		arffContent.append(t.getText().length()).append(",");
+	private String processNbMotsAttribute(String arffContent, Tweet t) {
+		NOMBREATTRIBUTS++;
+		String[] motsTexte = t.getText().split(" ");
+		return NOMBREATTRIBUTS - 1 + " " + motsTexte.length + ",";
 	}
 
-	private void processNbRetweetAttribute(StringBuilder arffContent, Tweet t) {
-		arffContent.append(t.getRetweetCount()).append(",");
+	private String processLongeurAttribute(String arffContent, Tweet t) {
+		NOMBREATTRIBUTS++;
+		return NOMBREATTRIBUTS - 1 + " " + t.getText().length() + ",";
 	}
 
-	private void processRetweetAttribute(StringBuilder arffContent, Tweet t) {
-		arffContent.append(t.isRetweet() ? "true," : "false,");
+	private String processNbRetweetAttribute(String arffContent, Tweet t) {
+		NOMBREATTRIBUTS++;
+		return NOMBREATTRIBUTS - 1 + " " + t.getRetweetCount() + ",";
+	}
+
+	private String processRetweetAttribute(String arffContent, Tweet t) {
+		NOMBREATTRIBUTS++;
+		return t.isRetweet() ? NOMBREATTRIBUTS - 1 + " \"true\","
+				: NOMBREATTRIBUTS - 1 + " \"false\",";
 
 	}
 
-	private void processPonctuationAttribute(StringBuilder arffContent, Tweet t) {
+	private String processPonctuationAttribute(String arffContent, Tweet t) {
+		NOMBREATTRIBUTS++;
 		if (t.getText().contains("!")) {
 			int count = 0;
 			for (int i = 0; i < t.getText().length(); i++)
 				if (t.getText().charAt(i) == ',')
 					count++;
 			if (count > 0 && count < 4) {
-				arffContent.append("regulier,");
+				return NOMBREATTRIBUTS - 1 + " \"regulier\",";
 			} else {
-				arffContent.append("surnombre,");
+				return NOMBREATTRIBUTS - 1 + " \"surnombre\",";
 			}
 		} else {
-			arffContent.append("absent,");
+			return NOMBREATTRIBUTS - 1 + " \"absent\",";
 		}
 
 	}
 
-	private void processArgotAttribute(StringBuilder arffContent, Tweet t) {
+	private String processSmileyContentAttribute(String arffContent, Tweet t) {
 		boolean ok = false;
 
-		for (String argot : ARGOT_TWITTER) {
-			if (t.getText().toLowerCase().contains(argot))
-				ok = true;
-		}
-
-		if (ok) {
-			arffContent.append("true,");
-		} else {
-			arffContent.append("false,");
-		}
-	}
-
-	private void processSmileyAttribute(StringBuilder arffContent, Tweet t) {
-		boolean ok = false;
-
-		for (String smile : SMILEYS) {
+		for (String smile : SMILEYSCONTENT) {
 			if (t.getText().contains(smile))
 				ok = true;
 		}
-
+		NOMBREATTRIBUTS++;
 		if (ok) {
-			arffContent.append("true,");
+			return NOMBREATTRIBUTS - 1 + " \"true\",";
 		} else {
-			arffContent.append("false,");
+			return NOMBREATTRIBUTS - 1 + " \"false\",";
 		}
 	}
 
-	private void processHashtagAttribute(StringBuilder arffContent, Tweet t) {
+	private String processSmileyPasContentAttribute(String arffContent, Tweet t) {
+
+		boolean ok = false;
+
+		for (String smile : SMILEYSPASCONTENT) {
+			if (t.getText().contains(smile))
+				ok = true;
+		}
+		NOMBREATTRIBUTS++;
+		if (ok) {
+			return NOMBREATTRIBUTS - 1 + " \"true\",";
+		} else {
+			return NOMBREATTRIBUTS - 1 + " \"false\",";
+		}
+	}
+
+	private String processHashtagAttribute(String arffContent, Tweet t) {
 		boolean ok = false;
 		for (String hashtag : t.getHashtags()) {
 			for (String arg : ARGOT_TWITTER) {
@@ -151,61 +210,16 @@ public class ArffWriter {
 					ok = true;
 			}
 		}
-
+		NOMBREATTRIBUTS++;
 		if (ok) {
-			arffContent.append("true,");
+			return NOMBREATTRIBUTS - 1 + " \"true\",";
 		} else {
-			arffContent.append("false,");
+			return NOMBREATTRIBUTS - 1 + " \"false\",";
 		}
 	}
 
-	private void processWordAttribute(StringBuilder arffContent, Tweet t) {
-
-		boolean ok = false;
-
-		for (String smile : ARGOT_TWITTER) {
-			if (t.getText().toLowerCase().contains(smile))
-				ok = true;
-		}
-		for (String smile : MOTS_DROLES) {
-			if (t.getText().toLowerCase().contains(smile))
-				ok = true;
-		}
-
-		if (ok) {
-			arffContent.append("true,");
-		} else {
-			arffContent.append("false,");
-		}
-	}
-
-	private void processTweetDroleAttribute(StringBuilder arffContent, Tweet t) {
-		arffContent.append("?");
-
-	}
-
-	private void processUserAttribute(StringBuilder arffContent, Tweet t) {
-
-		boolean ok = false;
-
-		for (String smile : MOTS_DROLES) {
-			if (t.getUser().toLowerCase().contains(smile))
-				ok = true;
-		}
-		for (String smile : ARGOT_TWITTER) {
-			if (t.getUser().toLowerCase().contains(smile))
-				ok = true;
-		}
-		for (String smile : SMILEYS) {
-			if (t.getUser().contains(smile))
-				ok = true;
-		}
-
-		if (ok) {
-			arffContent.append("true,");
-		} else {
-			arffContent.append("false,");
-		}
+	private String processDroleAttribute(String arffContent, Tweet t) {
+		return NOMBREATTRIBUTS + " ?}\n";
 	}
 
 }
