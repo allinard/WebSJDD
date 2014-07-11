@@ -192,6 +192,8 @@ public class LoginAction extends ActionSupport {
 		ret += getNumurgenciasnecesitandoingres() + ", ";
 		ret += getNumurgenciasnecesitandoingresno();
 
+		ret = ret.replaceAll("null", "?");
+		
 		return ret;
 	}
 
