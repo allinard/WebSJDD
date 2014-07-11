@@ -4,26 +4,21 @@ import java.io.IOException;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.util.ArrayList;
 import java.util.List;
-
-import twitter4j.TwitterException;
 
 import com.opensymphony.xwork2.ActionSupport;
 
 public class LoginAction extends ActionSupport {
 
+	// AUTOMATICAMENTE GENERADO
+	private static final long serialVersionUID = 1L;
+
+	// LISTA CAMPOS
 	private List<String> listaCampos;
 
-	private String username;
-
-	private String password;
-
-	private List<Tweet> listeTweets;
-
-	private int totalTrue;
-
-	private int totalFalse;
+	// CHECKBOXES
+	private boolean visitesUrgencies;
+	private boolean simptomesIntercrisisAsma;
 
 	// TODOS LOS ATRIBUTOS TOMADOS EN CUENTA EN LA CLASIFICACION
 	private String fechaini;
@@ -94,19 +89,21 @@ public class LoginAction extends ActionSupport {
 
 	public String execute() {
 
-		if (null != this.username) {
+		// SI queremos hacer predicción (uno de los checkbox está elegido)
+		if (isVisitesUrgencies() || isSimptomesIntercrisisAsma()) {
 
+			// procesamos la línea según los datos rellenados
 			String s = processArffLine();
-			
+
 			ArffWriter.write(s);
-			
+
 			List<double[]> predictions = WekaPredictor.classify();
+
 			double predictTrue = predictions.get(0)[1];
-			if (predictTrue > 0.95) {
-				totalTrue++;
-			} else {
-				totalFalse++;
-			}
+
+			System.out.println(predictions);
+			System.out.println(predictTrue);
+
 			return "success";
 		}
 
@@ -118,7 +115,96 @@ public class LoginAction extends ActionSupport {
 	}
 
 	private String processArffLine() {
-		return "";
+		String ret = "";
+
+		ret += "\"" + getFechaini() + "\", ";
+		ret += getEdad() + ", ";
+		ret += getCodigopoblacion() + ", ";
+		ret += getEnlesdarreres4setmanesambquinafreqüènciahatositduranteldiaenausènciaderefredat()
+				+ ", ";
+		ret += getEnlesdarreres4setmanesambquinafreqüèncialihacostatrespirarnopelnasperlanit()
+				+ ", ";
+		ret += getAltresmanifestacionsdatòpia() + ", ";
+		ret += getEdatdinicipatologiarespiratoriaanys() + ", ";
+		ret += getAntecedentspersonals() + ", ";
+		ret += getEnlesdarreres4setmanesquantesvegadeshaingresatenelhospitalacausadelasma()
+				+ ", ";
+		ret += getSímptomesintercrisisasma() + ", ";
+		ret += getCANControlAsmaNens07puntsboncontrol() + ", ";
+		ret += getEnlesdarreres4setmanesAmbquinafreqüènciahatingutxiuletsosibilànciesdurantlanit()
+				+ ", ";
+		ret += getDesencadenants() + ", ";
+		ret += getMoquetescatifesendomicilihabitual() + ", ";
+		ret += getVisitesaurgències() + ", ";
+		ret += getFreqüènciacrisisasma() + ", ";
+		ret += getIngresosperasma() + ", ";
+		ret += getTractamentdebaseperlasma() + ", ";
+		ret += getAsma() + ", ";
+		ret += getRinitis() + ", ";
+		ret += getAcaros() + ", ";
+		ret += getAlergia() + ", ";
+		ret += getRinoconjuntivitis() + ", ";
+		ret += getBudesonida() + ", ";
+		ret += getFluticasona() + ", ";
+		ret += getCiclesonida() + ", ";
+		ret += getMometasona() + ", ";
+		ret += getMontelukast() + ", ";
+		ret += getSingulair() + ", ";
+		ret += getSalmeterolfluticasona() + ", ";
+		ret += getFormoterolbudesonida() + ", ";
+		ret += getOmalizumab() + ", ";
+		ret += getOcs() + ", ";
+		ret += getSalbutamol() + ", ";
+		ret += getTossibilàncies() + ", ";
+		ret += getSímptomesderinoconjuntivitis() + ", ";
+		ret += getFumadorsaldomicilihabitual() + ", ";
+		ret += getMedicacióderescat() + ", ";
+		ret += getEnlesdarreres4setmanesambquinafreqüèncialihacostatrespirarnopelnasduranteldia()
+				+ ", ";
+		ret += getRespostaabroncodilatadors() + ", ";
+		ret += getDispneadiurna() + ", ";
+		ret += getEnlesdarreres4setmanesquanfaelnenexercicioesriuarialladestexiuletsotos()
+				+ ", ";
+		ret += getEstacionalitat() + ", ";
+		ret += getEnlesdarreres4setmanesquantsdieshavingutaurgènciesacausadelasma()
+				+ ", ";
+		ret += getEvolucioPatologia() + ", ";
+		ret += getAntecedentsfamiliarsdatòpia() + ", ";
+		ret += getReaccionsalaITE() + ", ";
+		ret += getEnlesdarreres4setmanesambquinafreqüènciahatositdurantlanitenausènciaderefredat()
+				+ ", ";
+		ret += getAltresantecedentsfamiliarsdinterès() + ", ";
+		ret += getDispneanocturna() + ", ";
+		ret += getImmunoteràpia() + ", ";
+		ret += getCrisisdasma() + ", ";
+		ret += getPis() + ", ";
+		ret += getHumed() + ", ";
+		ret += getCasa() + ", ";
+		ret += getVentilad() + ", ";
+		ret += getSolead() + ", ";
+		ret += getPeluches() + ", ";
+		ret += getEnlesdarreres4setmanesambquinafreqüènciahatingutxiuletsosibilànciesduranteldia()
+				+ ", ";
+		ret += getAnimalsaldomicilihabitual() + ", ";
+		ret += getTractamentdebaseperlarinitis() + ", ";
+		ret += getFaltesescolars() + ", ";
+		ret += getSímptomésambesforç() + ", ";
+		ret += getNumurgenciasnecesitandoingres() + ", ";
+		ret += getNumurgenciasnecesitandoingresno();
+
+		return ret;
+	}
+
+	public List<String> getListaCampos() {
+		try {
+			listaCampos = Files
+					.readAllLines(
+							Paths.get("/home/alexis/git/WebSJDD/input/listaCamposPrediccion.txt"),
+							Charset.forName("UTF-8"));
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		return listaCampos;
 	}
 
 	public String getEdad() {
@@ -652,59 +738,6 @@ public class LoginAction extends ActionSupport {
 		this.numurgenciasnecesitandoingresno = numurgenciasnecesitandoingresno;
 	}
 
-	public String getUsername() {
-		return username;
-	}
-
-	public void setUsername(String username) {
-		this.username = username;
-	}
-
-	public String getPassword() {
-		return password;
-	}
-
-	public void setPassword(String password) {
-		this.password = password;
-	}
-
-	public List<Tweet> getListeTweets() {
-		return listeTweets;
-	}
-
-	public void setListeTweets(List<Tweet> listeTweets) {
-		this.listeTweets = listeTweets;
-	}
-
-	public int getTotalTrue() {
-		return totalTrue;
-	}
-
-	public void setTotalTrue(int totalTrue) {
-		this.totalTrue = totalTrue;
-	}
-
-	public int getTotalFalse() {
-		return totalFalse;
-	}
-
-	public void setTotalFalse(int totalFalse) {
-		this.totalFalse = totalFalse;
-	}
-
-	public List<String> getListaCampos() {
-		try {
-			listaCampos = Files
-					.readAllLines(
-							Paths.get("/home/alexis/git/WebSJDD/input/listaCamposPrediccion.txt"),
-							Charset.forName("UTF-8"));
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-
-		return listaCampos;
-	}
-
 	public void setListaCampos(List<String> listeChamps) {
 		this.listaCampos = listeChamps;
 	}
@@ -715,6 +748,22 @@ public class LoginAction extends ActionSupport {
 
 	public void setFechaini(String fechaini) {
 		this.fechaini = fechaini;
+	}
+
+	public boolean isVisitesUrgencies() {
+		return visitesUrgencies;
+	}
+
+	public void setVisitesUrgencies(boolean visitesUrgencies) {
+		this.visitesUrgencies = visitesUrgencies;
+	}
+
+	public boolean isSimptomesIntercrisisAsma() {
+		return simptomesIntercrisisAsma;
+	}
+
+	public void setSimptomesIntercrisisAsma(boolean simptomesIntercrisisAsma) {
+		this.simptomesIntercrisisAsma = simptomesIntercrisisAsma;
 	}
 
 }

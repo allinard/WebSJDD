@@ -4,14 +4,13 @@ import java.util.ArrayList;
 import java.util.List;
 
 import weka.classifiers.bayes.NaiveBayes;
-import weka.classifiers.trees.RandomForest;
 import weka.core.Instance;
 import weka.core.Instances;
 import weka.core.SerializationHelper;
 import weka.core.converters.ConverterUtils.DataSource;
 
 public class WekaPredictor {
-	public static String PATH_TO_MODEL_FILE = "/home/alexis/git/WebTweetDrole/input/outputModelCorpusTweetNB.model";
+	public static String PATH_TO_MODEL_FILE = "/home/alexis/git/WebSJDD/input/outputModelCorpusTweetNB.model";
 
 	public static List<double[]> classify() {
 
@@ -24,7 +23,7 @@ public class WekaPredictor {
 			rf = (NaiveBayes) SerializationHelper.read(PATH_TO_MODEL_FILE);
 
 			DataSource source = new DataSource(
-					"/home/alexis/git/WebTweetDrole/input/outputReaded.arff");
+					"/home/alexis/git/WebSJDD/input/outputReaded.arff");
 			Instances data = source.getDataSet();
 			// setting class attribute if the data format does not provide this
 			// information

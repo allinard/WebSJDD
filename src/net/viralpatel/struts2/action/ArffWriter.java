@@ -4,11 +4,6 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.nio.charset.Charset;
-import java.nio.file.Files;
-import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.List;
 
 public class ArffWriter {
 
@@ -17,7 +12,7 @@ public class ArffWriter {
 		try {
 
 			File file = new File(
-					"/home/alexis/git/WebTweetDrole/input/outputReaded.arff");
+					"/home/alexis/git/WebSJDD/input/outputReaded.arff");
 			// if file doesnt exists, then create it
 			if (!file.exists()) {
 				file.createNewFile();
