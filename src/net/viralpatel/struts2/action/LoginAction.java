@@ -14,7 +14,7 @@ import com.opensymphony.xwork2.ActionSupport;
 public class LoginAction extends ActionSupport {
 
 	private List<String> listaCampos;
-	
+
 	private String username;
 
 	private String password;
@@ -24,10 +24,8 @@ public class LoginAction extends ActionSupport {
 	private int totalTrue;
 
 	private int totalFalse;
-	
-	
-	
-	//TODOS LOS ATRIBUTOS TOMADOS EN CUENTA EN LA CLASIFICACION
+
+	// TODOS LOS ATRIBUTOS TOMADOS EN CUENTA EN LA CLASIFICACION
 	private String fechaini;
 	private String edad;
 	private String codigopoblacion;
@@ -93,53 +91,36 @@ public class LoginAction extends ActionSupport {
 	private String Símptomésambesforç;
 	private String numurgenciasnecesitandoingres;
 	private String numurgenciasnecesitandoingresno;
-	
-	
-	
 
 	public String execute() {
 
-		if (null!=this.username) {
-			totalTrue = 0;
-			totalFalse = 0;
-			try {
-				listeTweets = GetTweet.processGetTweet(this.username);
-			} catch (TwitterException e) {
-				e.printStackTrace();
+		if (null != this.username) {
+
+			String s = processArffLine();
+			
+			ArffWriter.write(s);
+			
+			List<double[]> predictions = WekaPredictor.classify();
+			double predictTrue = predictions.get(0)[1];
+			if (predictTrue > 0.95) {
+				totalTrue++;
+			} else {
+				totalFalse++;
 			}
-
-			ArffWriter aW = new ArffWriter();
-
-			List<Tweet> listeTweets2 = new ArrayList<Tweet>();
-
-			listeTweets2.addAll(listeTweets);
-
-			try {
-				aW.processListeTweets(listeTweets2);
-				List<double[]> predictions = WekaPredictor.classify();
-				for (int j = 0; j < listeTweets2.size(); j++) {
-					double predictTrue = predictions.get(j)[1];
-					if (predictTrue > 0.95) {
-						totalTrue++;
-					} else {
-						listeTweets.remove(listeTweets2.get(j));
-						totalFalse++;
-					}
-				}
-			} catch (Exception e) {
-				e.printStackTrace();
-			}
-
 			return "success";
+		}
 
-		} else {
+		else {
 			addActionError(getText("error.login"));
 			return "error";
 		}
 
 	}
 
-	
+	private String processArffLine() {
+		return "";
+	}
+
 	public String getEdad() {
 		return edad;
 	}
@@ -178,7 +159,8 @@ public class LoginAction extends ActionSupport {
 		return Altresmanifestacionsdatòpia;
 	}
 
-	public void setAltresmanifestacionsdatòpia(String altresmanifestacionsdatòpia) {
+	public void setAltresmanifestacionsdatòpia(
+			String altresmanifestacionsdatòpia) {
 		Altresmanifestacionsdatòpia = altresmanifestacionsdatòpia;
 	}
 
@@ -423,7 +405,8 @@ public class LoginAction extends ActionSupport {
 		return Símptomesderinoconjuntivitis;
 	}
 
-	public void setSímptomesderinoconjuntivitis(String símptomesderinoconjuntivitis) {
+	public void setSímptomesderinoconjuntivitis(
+			String símptomesderinoconjuntivitis) {
 		Símptomesderinoconjuntivitis = símptomesderinoconjuntivitis;
 	}
 
@@ -506,7 +489,8 @@ public class LoginAction extends ActionSupport {
 		return Antecedentsfamiliarsdatòpia;
 	}
 
-	public void setAntecedentsfamiliarsdatòpia(String antecedentsfamiliarsdatòpia) {
+	public void setAntecedentsfamiliarsdatòpia(
+			String antecedentsfamiliarsdatòpia) {
 		Antecedentsfamiliarsdatòpia = antecedentsfamiliarsdatòpia;
 	}
 
@@ -629,7 +613,8 @@ public class LoginAction extends ActionSupport {
 		return Tractamentdebaseperlarinitis;
 	}
 
-	public void setTractamentdebaseperlarinitis(String tractamentdebaseperlarinitis) {
+	public void setTractamentdebaseperlarinitis(
+			String tractamentdebaseperlarinitis) {
 		Tractamentdebaseperlarinitis = tractamentdebaseperlarinitis;
 	}
 
@@ -709,13 +694,14 @@ public class LoginAction extends ActionSupport {
 
 	public List<String> getListaCampos() {
 		try {
-			listaCampos = Files.readAllLines(
-						Paths.get("/home/alexis/git/WebSJDD/input/listaCamposPrediccion.txt"),
-						Charset.forName("UTF-8"));
+			listaCampos = Files
+					.readAllLines(
+							Paths.get("/home/alexis/git/WebSJDD/input/listaCamposPrediccion.txt"),
+							Charset.forName("UTF-8"));
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		
+
 		return listaCampos;
 	}
 
