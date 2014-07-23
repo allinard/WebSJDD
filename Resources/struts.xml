@@ -13,7 +13,7 @@
     <package name="default" extends="struts-default" namespace="/">
     	<default-action-ref name="login" />
         <action name="login"
-            class="net.viralpatel.struts2.action.LoginAction">
+            class="com.example.asmaprediccio.LoginAction">
             <result name="success">Welcome.jsp</result>
             <result name="error">Login.jsp</result>
         </action>

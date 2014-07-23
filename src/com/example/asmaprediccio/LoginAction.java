@@ -1,4 +1,4 @@
-package net.viralpatel.struts2.action;
+package com.example.asmaprediccio;
 
 import java.io.IOException;
 import java.nio.charset.Charset;

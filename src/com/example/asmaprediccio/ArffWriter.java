@@ -1,4 +1,4 @@
-package net.viralpatel.struts2.action;
+package com.example.asmaprediccio;
 
 import java.io.BufferedWriter;
 import java.io.File;
@@ -9,13 +9,14 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.List;
 
+import com.example.asmaprediccio.utils.Constants;
+
 public class ArffWriter {
 
 	public static void writeCrisisDAsma(String processArffLineCrisisDAsma) {
 		try {
 
-			File file = new File(
-					"/home/alexis/git/WebSJDD/input/outputCrisisDAsma.arff");
+			File file = new File(Constants.OUTPUT_CRISIS_D_ASMA_ARFF);
 			// if file doesnt exists, then create it
 			if (!file.exists()) {
 				file.createNewFile();
@@ -26,7 +27,7 @@ public class ArffWriter {
 			// Encabezado
 			List<String> listaCampos = Files
 					.readAllLines(
-							Paths.get("/home/alexis/git/WebSJDD/input/encabezadoCrisisDAsma.arff"),
+							Paths.get(Constants.ENCABEZADO_CRISIS_D_ASMA_ARFF),
 							Charset.forName("UTF-8"));
 			for (String s : listaCampos) {
 				bw.write(s);
@@ -48,8 +49,7 @@ public class ArffWriter {
 			String processArffLineSimptomesIntercrisisAsma) {
 		try {
 
-			File file = new File(
-					"/home/alexis/git/WebSJDD/input/outputSimptomesIntercrisisAsma.arff");
+			File file = new File(Constants.OUTPUT_SIMPTOMES_INTERCRISIS_ASMA_ARFF);
 			// if file doesnt exists, then create it
 			if (!file.exists()) {
 				file.createNewFile();
@@ -60,7 +60,7 @@ public class ArffWriter {
 			// Encabezado
 			List<String> listaCampos = Files
 					.readAllLines(
-							Paths.get("/home/alexis/git/WebSJDD/input/encabezadoSimptomesIntercrisisAsma.arff"),
+							Paths.get(Constants.ENCABEZADO_SIMPTOMES_INTERCRISIS_ASMA_ARFF),
 							Charset.forName("UTF-8"));
 			for (String s : listaCampos) {
 				bw.write(s);
@@ -82,8 +82,7 @@ public class ArffWriter {
 	public static void writeTotesUrgencies(String processArffLineTotesUrgencies) {
 		try {
 
-			File file = new File(
-					"/home/alexis/git/WebSJDD/input/outputTotesUrgencies.arff");
+			File file = new File(Constants.OUTPUT_TOTES_URGENCIES_ARFF);
 			// if file doesnt exists, then create it
 			if (!file.exists()) {
 				file.createNewFile();
@@ -94,7 +93,7 @@ public class ArffWriter {
 			// Encabezado
 			List<String> listaCampos = Files
 					.readAllLines(
-							Paths.get("/home/alexis/git/WebSJDD/input/encabezadoTotesUrgencies.arff"),
+							Paths.get(Constants.ENCABEZADO_TOTES_URGENCIES_ARFF),
 							Charset.forName("UTF-8"));
 			for (String s : listaCampos) {
 				bw.write(s);
