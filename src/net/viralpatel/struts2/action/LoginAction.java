@@ -12,38 +12,30 @@ public class LoginAction extends ActionSupport {
 
 	// AUTOMATICAMENTE GENERADO
 	private static final long serialVersionUID = 1L;
+	
+	//CONTADOR
+	private static int COUNT = 0;
 
 	// LISTA CAMPOS
 	private List<String> listaCampos;
 
 	// CHECKBOXES
-	private boolean visitesUrgencies;
+	private boolean crisisAsma;
 	private boolean simptomesIntercrisisAsma;
+	private boolean totesUrgenciesPrediccio;
 
 	// TODOS LOS ATRIBUTOS TOMADOS EN CUENTA EN LA CLASIFICACION
 	private String fechaini;
 	private String edad;
 	private String codigopoblacion;
-	private String Enlesdarreres4setmanesambquinafreqüènciahatositduranteldiaenausènciaderefredat;
-	private String Enlesdarreres4setmanesambquinafreqüèncialihacostatrespirarnopelnasperlanit;
 	private String Altresmanifestacionsdatòpia;
 	private String Edatdinicipatologiarespiratoriaanys;
-	private String Antecedentspersonals;
-	private String Enlesdarreres4setmanesquantesvegadeshaingresatenelhospitalacausadelasma;
 	private String Símptomesintercrisisasma;
 	private String CANControlAsmaNens07puntsboncontrol;
-	private String Enlesdarreres4setmanesAmbquinafreqüènciahatingutxiuletsosibilànciesdurantlanit;
-	private String Desencadenants;
-	private String Moquetescatifesendomicilihabitual;
-	private String Visitesaurgències;
 	private String Freqüènciacrisisasma;
 	private String Ingresosperasma;
 	private String Tractamentdebaseperlasma;
-	private String asma;
-	private String rinitis;
 	private String acaros;
-	private String alergia;
-	private String rinoconjuntivitis;
 	private String budesonida;
 	private String fluticasona;
 	private String ciclesonida;
@@ -53,149 +45,171 @@ public class LoginAction extends ActionSupport {
 	private String salmeterolfluticasona;
 	private String formoterolbudesonida;
 	private String omalizumab;
-	private String ocs;
-	private String salbutamol;
-	private String Tossibilàncies;
-	private String Símptomesderinoconjuntivitis;
+	private String FEV1;
+	private String FEF2575;
 	private String Fumadorsaldomicilihabitual;
 	private String Medicacióderescat;
-	private String Enlesdarreres4setmanesambquinafreqüèncialihacostatrespirarnopelnasduranteldia;
-	private String Respostaabroncodilatadors;
-	private String Dispneadiurna;
-	private String Enlesdarreres4setmanesquanfaelnenexercicioesriuarialladestexiuletsotos;
-	private String Estacionalitat;
-	private String Enlesdarreres4setmanesquantsdieshavingutaurgènciesacausadelasma;
-	private String evolucioPatologia;
 	private String Antecedentsfamiliarsdatòpia;
-	private String ReaccionsalaITE;
-	private String Enlesdarreres4setmanesambquinafreqüènciahatositdurantlanitenausènciaderefredat;
-	private String Altresantecedentsfamiliarsdinterès;
 	private String Dispneanocturna;
 	private String Immunoteràpia;
 	private String Crisisdasma;
-	private String pis;
-	private String humed;
-	private String casa;
-	private String ventilad;
-	private String solead;
-	private String peluches;
-	private String Enlesdarreres4setmanesambquinafreqüènciahatingutxiuletsosibilànciesduranteldia;
-	private String Animalsaldomicilihabitual;
-	private String Tractamentdebaseperlarinitis;
-	private String Faltesescolars;
 	private String Símptomésambesforç;
-	private String numurgenciasnecesitandoingres;
-	private String numurgenciasnecesitandoingresno;
+	private String totesUrgencies;
+	
+	//PROBABILIDADES OUTCOMES
+	private double porcentajeTotesUrgencies;
+	private double porcentajeCrisisAsma;
+	private double porcentajeSimtomesIntercrisisAsma;
 
+	
+	
+	//EJECUCIÓN
 	public String execute() {
 
 		// SI queremos hacer predicción (uno de los checkbox está elegido)
-		if (isVisitesUrgencies() || isSimptomesIntercrisisAsma()) {
+		if (COUNT!=0) {
 
-			// procesamos la línea según los datos rellenados
-			String s = processArffLine();
-
-			ArffWriter.write(s);
+			// procesamos ficheros arff para predicciones
+			ArffWriter.writeCrisisDAsma(processArffLineCrisisDAsma());
+			ArffWriter.writeSimptomesIntercrisisAsma(processArffLineSimptomesIntercrisisAsma());
+			ArffWriter.writeTotesUrgencies(processArffLineTotesUrgencies());
 
 			List<double[]> predictions = WekaPredictor.classify();
 
-			double predictTrue = predictions.get(0)[1];
-
-			System.out.println(predictions);
-			System.out.println(predictTrue);
-
+			porcentajeTotesUrgencies = predictions.get(0)[1]*100;
+			porcentajeSimtomesIntercrisisAsma = predictions.get(1)[1]*100;
+			porcentajeCrisisAsma = predictions.get(2)[1]*100;
+			
+			COUNT = 0;
 			return "success";
 		}
 
 		else {
-			addActionError(getText("error.login"));
+			COUNT++;
 			return "error";
 		}
 
 	}
 
-	private String processArffLine() {
+	private String processArffLineCrisisDAsma() {
 		String ret = "";
 
-		ret += "\"" + getFechaini() + "\", ";
-		ret += getEdad() + ", ";
-		ret += getCodigopoblacion() + ", ";
-		ret += getEnlesdarreres4setmanesambquinafreqüènciahatositduranteldiaenausènciaderefredat()
-				+ ", ";
-		ret += getEnlesdarreres4setmanesambquinafreqüèncialihacostatrespirarnopelnasperlanit()
-				+ ", ";
-		ret += getAltresmanifestacionsdatòpia() + ", ";
-		ret += getEdatdinicipatologiarespiratoriaanys() + ", ";
-		ret += getAntecedentspersonals() + ", ";
-		ret += getEnlesdarreres4setmanesquantesvegadeshaingresatenelhospitalacausadelasma()
-				+ ", ";
-		ret += getSímptomesintercrisisasma() + ", ";
-		ret += getCANControlAsmaNens07puntsboncontrol() + ", ";
-		ret += getEnlesdarreres4setmanesAmbquinafreqüènciahatingutxiuletsosibilànciesdurantlanit()
-				+ ", ";
-		ret += getDesencadenants() + ", ";
-		ret += getMoquetescatifesendomicilihabitual() + ", ";
-		ret += getVisitesaurgències() + ", ";
-		ret += getFreqüènciacrisisasma() + ", ";
-		ret += getIngresosperasma() + ", ";
-		ret += getTractamentdebaseperlasma() + ", ";
-		ret += getAsma() + ", ";
-		ret += getRinitis() + ", ";
-		ret += getAcaros() + ", ";
-		ret += getAlergia() + ", ";
-		ret += getRinoconjuntivitis() + ", ";
-		ret += getBudesonida() + ", ";
-		ret += getFluticasona() + ", ";
-		ret += getCiclesonida() + ", ";
-		ret += getMometasona() + ", ";
-		ret += getMontelukast() + ", ";
-		ret += getSingulair() + ", ";
-		ret += getSalmeterolfluticasona() + ", ";
-		ret += getFormoterolbudesonida() + ", ";
-		ret += getOmalizumab() + ", ";
-		ret += getOcs() + ", ";
-		ret += getSalbutamol() + ", ";
-		ret += getTossibilàncies() + ", ";
-		ret += getSímptomesderinoconjuntivitis() + ", ";
-		ret += getFumadorsaldomicilihabitual() + ", ";
-		ret += getMedicacióderescat() + ", ";
-		ret += getEnlesdarreres4setmanesambquinafreqüèncialihacostatrespirarnopelnasduranteldia()
-				+ ", ";
-		ret += getRespostaabroncodilatadors() + ", ";
-		ret += getDispneadiurna() + ", ";
-		ret += getEnlesdarreres4setmanesquanfaelnenexercicioesriuarialladestexiuletsotos()
-				+ ", ";
-		ret += getEstacionalitat() + ", ";
-		ret += getEnlesdarreres4setmanesquantsdieshavingutaurgènciesacausadelasma()
-				+ ", ";
-		ret += getEvolucioPatologia() + ", ";
-		ret += getAntecedentsfamiliarsdatòpia() + ", ";
-		ret += getReaccionsalaITE() + ", ";
-		ret += getEnlesdarreres4setmanesambquinafreqüènciahatositdurantlanitenausènciaderefredat()
-				+ ", ";
-		ret += getAltresantecedentsfamiliarsdinterès() + ", ";
-		ret += getDispneanocturna() + ", ";
-		ret += getImmunoteràpia() + ", ";
-		ret += getCrisisdasma() + ", ";
-		ret += getPis() + ", ";
-		ret += getHumed() + ", ";
-		ret += getCasa() + ", ";
-		ret += getVentilad() + ", ";
-		ret += getSolead() + ", ";
-		ret += getPeluches() + ", ";
-		ret += getEnlesdarreres4setmanesambquinafreqüènciahatingutxiuletsosibilànciesduranteldia()
-				+ ", ";
-		ret += getAnimalsaldomicilihabitual() + ", ";
-		ret += getTractamentdebaseperlarinitis() + ", ";
-		ret += getFaltesescolars() + ", ";
-		ret += getSímptomésambesforç() + ", ";
-		ret += getNumurgenciasnecesitandoingres() + ", ";
-		ret += getNumurgenciasnecesitandoingresno();
+		ret += getFechaini() + ",";
+		ret += getEdad() + ",";
+		ret += getCodigopoblacion() + ",";
+		ret += getAltresmanifestacionsdatòpia() + ",";
+		ret += getEdatdinicipatologiarespiratoriaanys() + ",";
+		//ret += getSímptomesintercrisisasma() + ",";
+		ret += getCANControlAsmaNens07puntsboncontrol() + ",";
+		ret += getFreqüènciacrisisasma() + ",";
+		ret += getIngresosperasma() + ",";
+		ret += getTractamentdebaseperlasma() + ",";
+		ret += getAcaros() + ",";
+		ret += getBudesonida() + ",";
+		ret += getFluticasona() + ",";
+		ret += getCiclesonida() + ",";
+		ret += getMometasona() + ",";
+		ret += getMontelukast() + ",";
+		ret += getSingulair() + ",";
+		ret += getSalmeterolfluticasona() + ",";
+		ret += getFormoterolbudesonida() + ",";
+		ret += getOmalizumab() + ",";
+		ret += getFEV1() + ",";
+		ret += getFEF2575() + ",";
+		ret += getFumadorsaldomicilihabitual() + ",";
+		ret += getMedicacióderescat() + ",";
+		ret += getAntecedentsfamiliarsdatòpia() + ",";
+		ret += getDispneanocturna() + ",";
+		ret += getImmunoteràpia() + ",";
+		ret += getCrisisdasma() + ",";
+		ret += getSímptomésambesforç() + ",";
+		//ret += getTotesUrgencies();
 
-		ret = ret.replaceAll("null", "?");
+		ret = ret.replaceAll("null","?");
 		
 		return ret;
 	}
+	
+	
+	private String processArffLineTotesUrgencies() {
+		String ret = "";
+
+		ret += getFechaini() + ",";
+		ret += getEdad() + ",";
+		ret += getCodigopoblacion() + ",";
+		ret += getAltresmanifestacionsdatòpia() + ",";
+		ret += getEdatdinicipatologiarespiratoriaanys() + ",";
+		//ret += getSímptomesintercrisisasma() + ",";
+		ret += getCANControlAsmaNens07puntsboncontrol() + ",";
+		ret += getFreqüènciacrisisasma() + ",";
+		ret += getIngresosperasma() + ",";
+		ret += getTractamentdebaseperlasma() + ",";
+		ret += getAcaros() + ",";
+		ret += getBudesonida() + ",";
+		ret += getFluticasona() + ",";
+		ret += getCiclesonida() + ",";
+		ret += getMometasona() + ",";
+		ret += getMontelukast() + ",";
+		ret += getSingulair() + ",";
+		ret += getSalmeterolfluticasona() + ",";
+		ret += getFormoterolbudesonida() + ",";
+		ret += getOmalizumab() + ",";
+		ret += getFEV1() + ",";
+		ret += getFEF2575() + ",";
+		ret += getFumadorsaldomicilihabitual() + ",";
+		ret += getMedicacióderescat() + ",";
+		ret += getAntecedentsfamiliarsdatòpia() + ",";
+		ret += getDispneanocturna() + ",";
+		ret += getImmunoteràpia() + ",";
+		//ret += getCrisisdasma() + ",";
+		ret += getSímptomésambesforç() + ",";
+		ret += getTotesUrgencies();
+
+		ret = ret.replaceAll("null","?");
+		
+		return ret;
+	}
+	
+	
+	private String processArffLineSimptomesIntercrisisAsma() {
+		String ret = "";
+
+		ret += getFechaini() + ",";
+		ret += getEdad() + ",";
+		ret += getCodigopoblacion() + ",";
+		ret += getAltresmanifestacionsdatòpia() + ",";
+		ret += getEdatdinicipatologiarespiratoriaanys() + ",";
+		ret += getSímptomesintercrisisasma() + ",";
+		ret += getCANControlAsmaNens07puntsboncontrol() + ",";
+		ret += getFreqüènciacrisisasma() + ",";
+		ret += getIngresosperasma() + ",";
+		ret += getTractamentdebaseperlasma() + ",";
+		ret += getAcaros() + ",";
+		ret += getBudesonida() + ",";
+		ret += getFluticasona() + ",";
+		ret += getCiclesonida() + ",";
+		ret += getMometasona() + ",";
+		ret += getMontelukast() + ",";
+		ret += getSingulair() + ",";
+		ret += getSalmeterolfluticasona() + ",";
+		ret += getFormoterolbudesonida() + ",";
+		ret += getOmalizumab() + ",";
+		ret += getFEV1() + ",";
+		ret += getFEF2575() + ",";
+		ret += getFumadorsaldomicilihabitual() + ",";
+		ret += getMedicacióderescat() + ",";
+		ret += getAntecedentsfamiliarsdatòpia() + ",";
+		ret += getDispneanocturna() + ",";
+		ret += getImmunoteràpia() + ",";
+		//ret += getCrisisdasma() + ",";
+		ret += getSímptomésambesforç() + ",";
+		//ret += getTotesUrgencies();
+
+		ret = ret.replaceAll("null","?");
+		
+		return ret;
+	}
+	
 
 	public List<String> getListaCampos() {
 		try {
@@ -225,24 +239,6 @@ public class LoginAction extends ActionSupport {
 		this.codigopoblacion = codigopoblacion;
 	}
 
-	public String getEnlesdarreres4setmanesambquinafreqüènciahatositduranteldiaenausènciaderefredat() {
-		return Enlesdarreres4setmanesambquinafreqüènciahatositduranteldiaenausènciaderefredat;
-	}
-
-	public void setEnlesdarreres4setmanesambquinafreqüènciahatositduranteldiaenausènciaderefredat(
-			String enlesdarreres4setmanesambquinafreqüènciahatositduranteldiaenausènciaderefredat) {
-		Enlesdarreres4setmanesambquinafreqüènciahatositduranteldiaenausènciaderefredat = enlesdarreres4setmanesambquinafreqüènciahatositduranteldiaenausènciaderefredat;
-	}
-
-	public String getEnlesdarreres4setmanesambquinafreqüèncialihacostatrespirarnopelnasperlanit() {
-		return Enlesdarreres4setmanesambquinafreqüèncialihacostatrespirarnopelnasperlanit;
-	}
-
-	public void setEnlesdarreres4setmanesambquinafreqüèncialihacostatrespirarnopelnasperlanit(
-			String enlesdarreres4setmanesambquinafreqüèncialihacostatrespirarnopelnasperlanit) {
-		Enlesdarreres4setmanesambquinafreqüèncialihacostatrespirarnopelnasperlanit = enlesdarreres4setmanesambquinafreqüèncialihacostatrespirarnopelnasperlanit;
-	}
-
 	public String getAltresmanifestacionsdatòpia() {
 		return Altresmanifestacionsdatòpia;
 	}
@@ -261,23 +257,6 @@ public class LoginAction extends ActionSupport {
 		Edatdinicipatologiarespiratoriaanys = edatdinicipatologiarespiratoriaanys;
 	}
 
-	public String getAntecedentspersonals() {
-		return Antecedentspersonals;
-	}
-
-	public void setAntecedentspersonals(String antecedentspersonals) {
-		Antecedentspersonals = antecedentspersonals;
-	}
-
-	public String getEnlesdarreres4setmanesquantesvegadeshaingresatenelhospitalacausadelasma() {
-		return Enlesdarreres4setmanesquantesvegadeshaingresatenelhospitalacausadelasma;
-	}
-
-	public void setEnlesdarreres4setmanesquantesvegadeshaingresatenelhospitalacausadelasma(
-			String enlesdarreres4setmanesquantesvegadeshaingresatenelhospitalacausadelasma) {
-		Enlesdarreres4setmanesquantesvegadeshaingresatenelhospitalacausadelasma = enlesdarreres4setmanesquantesvegadeshaingresatenelhospitalacausadelasma;
-	}
-
 	public String getSímptomesintercrisisasma() {
 		return Símptomesintercrisisasma;
 	}
@@ -293,40 +272,6 @@ public class LoginAction extends ActionSupport {
 	public void setCANControlAsmaNens07puntsboncontrol(
 			String cANControlAsmaNens07puntsboncontrol) {
 		CANControlAsmaNens07puntsboncontrol = cANControlAsmaNens07puntsboncontrol;
-	}
-
-	public String getEnlesdarreres4setmanesAmbquinafreqüènciahatingutxiuletsosibilànciesdurantlanit() {
-		return Enlesdarreres4setmanesAmbquinafreqüènciahatingutxiuletsosibilànciesdurantlanit;
-	}
-
-	public void setEnlesdarreres4setmanesAmbquinafreqüènciahatingutxiuletsosibilànciesdurantlanit(
-			String enlesdarreres4setmanesAmbquinafreqüènciahatingutxiuletsosibilànciesdurantlanit) {
-		Enlesdarreres4setmanesAmbquinafreqüènciahatingutxiuletsosibilànciesdurantlanit = enlesdarreres4setmanesAmbquinafreqüènciahatingutxiuletsosibilànciesdurantlanit;
-	}
-
-	public String getDesencadenants() {
-		return Desencadenants;
-	}
-
-	public void setDesencadenants(String desencadenants) {
-		Desencadenants = desencadenants;
-	}
-
-	public String getMoquetescatifesendomicilihabitual() {
-		return Moquetescatifesendomicilihabitual;
-	}
-
-	public void setMoquetescatifesendomicilihabitual(
-			String moquetescatifesendomicilihabitual) {
-		Moquetescatifesendomicilihabitual = moquetescatifesendomicilihabitual;
-	}
-
-	public String getVisitesaurgències() {
-		return Visitesaurgències;
-	}
-
-	public void setVisitesaurgències(String visitesaurgències) {
-		Visitesaurgències = visitesaurgències;
 	}
 
 	public String getFreqüènciacrisisasma() {
@@ -353,44 +298,12 @@ public class LoginAction extends ActionSupport {
 		Tractamentdebaseperlasma = tractamentdebaseperlasma;
 	}
 
-	public String getAsma() {
-		return asma;
-	}
-
-	public void setAsma(String asma) {
-		this.asma = asma;
-	}
-
-	public String getRinitis() {
-		return rinitis;
-	}
-
-	public void setRinitis(String rinitis) {
-		this.rinitis = rinitis;
-	}
-
 	public String getAcaros() {
 		return acaros;
 	}
 
 	public void setAcaros(String acaros) {
 		this.acaros = acaros;
-	}
-
-	public String getAlergia() {
-		return alergia;
-	}
-
-	public void setAlergia(String alergia) {
-		this.alergia = alergia;
-	}
-
-	public String getRinoconjuntivitis() {
-		return rinoconjuntivitis;
-	}
-
-	public void setRinoconjuntivitis(String rinoconjuntivitis) {
-		this.rinoconjuntivitis = rinoconjuntivitis;
 	}
 
 	public String getBudesonida() {
@@ -465,39 +378,6 @@ public class LoginAction extends ActionSupport {
 		this.omalizumab = omalizumab;
 	}
 
-	public String getOcs() {
-		return ocs;
-	}
-
-	public void setOcs(String ocs) {
-		this.ocs = ocs;
-	}
-
-	public String getSalbutamol() {
-		return salbutamol;
-	}
-
-	public void setSalbutamol(String salbutamol) {
-		this.salbutamol = salbutamol;
-	}
-
-	public String getTossibilàncies() {
-		return Tossibilàncies;
-	}
-
-	public void setTossibilàncies(String tossibilàncies) {
-		Tossibilàncies = tossibilàncies;
-	}
-
-	public String getSímptomesderinoconjuntivitis() {
-		return Símptomesderinoconjuntivitis;
-	}
-
-	public void setSímptomesderinoconjuntivitis(
-			String símptomesderinoconjuntivitis) {
-		Símptomesderinoconjuntivitis = símptomesderinoconjuntivitis;
-	}
-
 	public String getFumadorsaldomicilihabitual() {
 		return Fumadorsaldomicilihabitual;
 	}
@@ -514,65 +394,6 @@ public class LoginAction extends ActionSupport {
 		Medicacióderescat = medicacióderescat;
 	}
 
-	public String getEnlesdarreres4setmanesambquinafreqüèncialihacostatrespirarnopelnasduranteldia() {
-		return Enlesdarreres4setmanesambquinafreqüèncialihacostatrespirarnopelnasduranteldia;
-	}
-
-	public void setEnlesdarreres4setmanesambquinafreqüèncialihacostatrespirarnopelnasduranteldia(
-			String enlesdarreres4setmanesambquinafreqüèncialihacostatrespirarnopelnasduranteldia) {
-		Enlesdarreres4setmanesambquinafreqüèncialihacostatrespirarnopelnasduranteldia = enlesdarreres4setmanesambquinafreqüèncialihacostatrespirarnopelnasduranteldia;
-	}
-
-	public String getRespostaabroncodilatadors() {
-		return Respostaabroncodilatadors;
-	}
-
-	public void setRespostaabroncodilatadors(String respostaabroncodilatadors) {
-		Respostaabroncodilatadors = respostaabroncodilatadors;
-	}
-
-	public String getDispneadiurna() {
-		return Dispneadiurna;
-	}
-
-	public void setDispneadiurna(String dispneadiurna) {
-		Dispneadiurna = dispneadiurna;
-	}
-
-	public String getEnlesdarreres4setmanesquanfaelnenexercicioesriuarialladestexiuletsotos() {
-		return Enlesdarreres4setmanesquanfaelnenexercicioesriuarialladestexiuletsotos;
-	}
-
-	public void setEnlesdarreres4setmanesquanfaelnenexercicioesriuarialladestexiuletsotos(
-			String enlesdarreres4setmanesquanfaelnenexercicioesriuarialladestexiuletsotos) {
-		Enlesdarreres4setmanesquanfaelnenexercicioesriuarialladestexiuletsotos = enlesdarreres4setmanesquanfaelnenexercicioesriuarialladestexiuletsotos;
-	}
-
-	public String getEstacionalitat() {
-		return Estacionalitat;
-	}
-
-	public void setEstacionalitat(String estacionalitat) {
-		Estacionalitat = estacionalitat;
-	}
-
-	public String getEnlesdarreres4setmanesquantsdieshavingutaurgènciesacausadelasma() {
-		return Enlesdarreres4setmanesquantsdieshavingutaurgènciesacausadelasma;
-	}
-
-	public void setEnlesdarreres4setmanesquantsdieshavingutaurgènciesacausadelasma(
-			String enlesdarreres4setmanesquantsdieshavingutaurgènciesacausadelasma) {
-		Enlesdarreres4setmanesquantsdieshavingutaurgènciesacausadelasma = enlesdarreres4setmanesquantsdieshavingutaurgènciesacausadelasma;
-	}
-
-	public String getEvolucioPatologia() {
-		return evolucioPatologia;
-	}
-
-	public void setEvolucioPatologia(String evolucioPatologia) {
-		this.evolucioPatologia = evolucioPatologia;
-	}
-
 	public String getAntecedentsfamiliarsdatòpia() {
 		return Antecedentsfamiliarsdatòpia;
 	}
@@ -580,32 +401,6 @@ public class LoginAction extends ActionSupport {
 	public void setAntecedentsfamiliarsdatòpia(
 			String antecedentsfamiliarsdatòpia) {
 		Antecedentsfamiliarsdatòpia = antecedentsfamiliarsdatòpia;
-	}
-
-	public String getReaccionsalaITE() {
-		return ReaccionsalaITE;
-	}
-
-	public void setReaccionsalaITE(String reaccionsalaITE) {
-		ReaccionsalaITE = reaccionsalaITE;
-	}
-
-	public String getEnlesdarreres4setmanesambquinafreqüènciahatositdurantlanitenausènciaderefredat() {
-		return Enlesdarreres4setmanesambquinafreqüènciahatositdurantlanitenausènciaderefredat;
-	}
-
-	public void setEnlesdarreres4setmanesambquinafreqüènciahatositdurantlanitenausènciaderefredat(
-			String enlesdarreres4setmanesambquinafreqüènciahatositdurantlanitenausènciaderefredat) {
-		Enlesdarreres4setmanesambquinafreqüènciahatositdurantlanitenausènciaderefredat = enlesdarreres4setmanesambquinafreqüènciahatositdurantlanitenausènciaderefredat;
-	}
-
-	public String getAltresantecedentsfamiliarsdinterès() {
-		return Altresantecedentsfamiliarsdinterès;
-	}
-
-	public void setAltresantecedentsfamiliarsdinterès(
-			String altresantecedentsfamiliarsdinterès) {
-		Altresantecedentsfamiliarsdinterès = altresantecedentsfamiliarsdinterès;
 	}
 
 	public String getDispneanocturna() {
@@ -632,112 +427,12 @@ public class LoginAction extends ActionSupport {
 		Crisisdasma = crisisdasma;
 	}
 
-	public String getPis() {
-		return pis;
-	}
-
-	public void setPis(String pis) {
-		this.pis = pis;
-	}
-
-	public String getHumed() {
-		return humed;
-	}
-
-	public void setHumed(String humed) {
-		this.humed = humed;
-	}
-
-	public String getCasa() {
-		return casa;
-	}
-
-	public void setCasa(String casa) {
-		this.casa = casa;
-	}
-
-	public String getVentilad() {
-		return ventilad;
-	}
-
-	public void setVentilad(String ventilad) {
-		this.ventilad = ventilad;
-	}
-
-	public String getSolead() {
-		return solead;
-	}
-
-	public void setSolead(String solead) {
-		this.solead = solead;
-	}
-
-	public String getPeluches() {
-		return peluches;
-	}
-
-	public void setPeluches(String peluches) {
-		this.peluches = peluches;
-	}
-
-	public String getEnlesdarreres4setmanesambquinafreqüènciahatingutxiuletsosibilànciesduranteldia() {
-		return Enlesdarreres4setmanesambquinafreqüènciahatingutxiuletsosibilànciesduranteldia;
-	}
-
-	public void setEnlesdarreres4setmanesambquinafreqüènciahatingutxiuletsosibilànciesduranteldia(
-			String enlesdarreres4setmanesambquinafreqüènciahatingutxiuletsosibilànciesduranteldia) {
-		Enlesdarreres4setmanesambquinafreqüènciahatingutxiuletsosibilànciesduranteldia = enlesdarreres4setmanesambquinafreqüènciahatingutxiuletsosibilànciesduranteldia;
-	}
-
-	public String getAnimalsaldomicilihabitual() {
-		return Animalsaldomicilihabitual;
-	}
-
-	public void setAnimalsaldomicilihabitual(String animalsaldomicilihabitual) {
-		Animalsaldomicilihabitual = animalsaldomicilihabitual;
-	}
-
-	public String getTractamentdebaseperlarinitis() {
-		return Tractamentdebaseperlarinitis;
-	}
-
-	public void setTractamentdebaseperlarinitis(
-			String tractamentdebaseperlarinitis) {
-		Tractamentdebaseperlarinitis = tractamentdebaseperlarinitis;
-	}
-
-	public String getFaltesescolars() {
-		return Faltesescolars;
-	}
-
-	public void setFaltesescolars(String faltesescolars) {
-		Faltesescolars = faltesescolars;
-	}
-
 	public String getSímptomésambesforç() {
 		return Símptomésambesforç;
 	}
 
 	public void setSímptomésambesforç(String símptomésambesforç) {
 		Símptomésambesforç = símptomésambesforç;
-	}
-
-	public String getNumurgenciasnecesitandoingres() {
-		return numurgenciasnecesitandoingres;
-	}
-
-	public void setNumurgenciasnecesitandoingres(
-			String numurgenciasnecesitandoingres) {
-		this.numurgenciasnecesitandoingres = numurgenciasnecesitandoingres;
-	}
-
-	public String getNumurgenciasnecesitandoingresno() {
-		return numurgenciasnecesitandoingresno;
-	}
-
-	public void setNumurgenciasnecesitandoingresno(
-			String numurgenciasnecesitandoingresno) {
-		this.numurgenciasnecesitandoingresno = numurgenciasnecesitandoingresno;
 	}
 
 	public void setListaCampos(List<String> listeChamps) {
@@ -752,20 +447,77 @@ public class LoginAction extends ActionSupport {
 		this.fechaini = fechaini;
 	}
 
-	public boolean isVisitesUrgencies() {
-		return visitesUrgencies;
-	}
-
-	public void setVisitesUrgencies(boolean visitesUrgencies) {
-		this.visitesUrgencies = visitesUrgencies;
-	}
-
 	public boolean isSimptomesIntercrisisAsma() {
 		return simptomesIntercrisisAsma;
 	}
 
 	public void setSimptomesIntercrisisAsma(boolean simptomesIntercrisisAsma) {
 		this.simptomesIntercrisisAsma = simptomesIntercrisisAsma;
+	}
+
+	public boolean isCrisisAsma() {
+		return crisisAsma;
+	}
+
+	public void setCrisisAsma(boolean crisisAsma) {
+		this.crisisAsma = crisisAsma;
+	}
+
+	public boolean isTotesUrgenciesPrediccio() {
+		return totesUrgenciesPrediccio;
+	}
+
+	public void setTotesUrgenciesPrediccio(boolean totesUrgenciesPrediccio) {
+		this.totesUrgenciesPrediccio = totesUrgenciesPrediccio;
+	}
+
+	public String getFEV1() {
+		return FEV1;
+	}
+
+	public void setFEV1(String fEV1) {
+		FEV1 = fEV1;
+	}
+
+	public String getFEF2575() {
+		return FEF2575;
+	}
+
+	public void setFEF2575(String fEF2575) {
+		FEF2575 = fEF2575;
+	}
+
+	public String getTotesUrgencies() {
+		return totesUrgencies;
+	}
+
+	public void setTotesUrgencies(String totesUrgencies) {
+		this.totesUrgencies = totesUrgencies;
+	}
+
+	public double getPorcentajeCrisisAsma() {
+		return porcentajeCrisisAsma;
+	}
+
+	public void setPorcentajeCrisisAsma(double porcentajeCrisisAsma) {
+		this.porcentajeCrisisAsma = porcentajeCrisisAsma;
+	}
+
+	public double getPorcentajeTotesUrgencies() {
+		return porcentajeTotesUrgencies;
+	}
+
+	public void setPorcentajeTotesUrgencies(double porcentajeTotesUrgencies) {
+		this.porcentajeTotesUrgencies = porcentajeTotesUrgencies;
+	}
+
+	public double getPorcentajeSimtomesIntercrisisAsma() {
+		return porcentajeSimtomesIntercrisisAsma;
+	}
+
+	public void setPorcentajeSimtomesIntercrisisAsma(
+			double porcentajeSimtomesIntercrisisAsma) {
+		this.porcentajeSimtomesIntercrisisAsma = porcentajeSimtomesIntercrisisAsma;
 	}
 
 }

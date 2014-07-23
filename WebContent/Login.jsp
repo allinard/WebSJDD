@@ -39,23 +39,23 @@
 			<div id="form_wrapper" class="form_wrapper">
 
 
-				
+
 				<s:form action="login.action" method="post" class="login active">
-				
-			    	 <s:checkbox name="visitesUrgencies" fieldValue="true" value="false" label="Visites a urgenciès"/>
-					 <s:checkbox name="simptomesIntercrisisAsma" fieldValue="true" value="false" label="Símptomes intercrisis asma"/>
-				
+
+					<br>
 					<table>
 
 						<s:iterator value="listaCampos" var="campo">
 							<s:if test="#campo == 'fechaini'">
 								<tr>
-									<td><s:textfield name="%{#campo}" label="%{#campo}" value="01/01/2014" size="600" /></td>
+									<td><s:textfield name="%{#campo}" label="%{#campo}"
+											value="01/01/2014" size="600" /></td>
 								</tr>
 							</s:if>
 							<s:else>
 								<tr>
-									<td><s:textfield name="%{#campo}" label="%{#campo}" value="?" size="600" /></td>
+									<td><s:textfield name="%{#campo}" label="%{#campo}"
+											value="?" size="600" /></td>
 								</tr>
 							</s:else>
 						</s:iterator>

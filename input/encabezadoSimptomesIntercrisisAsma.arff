@@ -1,0 +1,32 @@
+@relation 'prediccioasma'
+
+@attribute fechaini date dd/MM/yyyy
+@attribute edad numeric
+@attribute codigopoblacion numeric
+@attribute Altresmanifestacionsdatòpia {0,1}
+@attribute Edatdinicipatologiarespiratoriaanys numeric
+@attribute Símptomesintercrisisasma {0,1}
+@attribute CANControlAsmaNens0-7puntsboncontrol numeric
+@attribute Freqüènciacrisisasma numeric
+@attribute Ingresosperasma {0,1}
+@attribute Tractamentdebaseperlasma {0,1}
+@attribute acaros {0,1}
+@attribute budesonida {0,1}
+@attribute fluticasona {0,1}
+@attribute ciclesonida {0,1}
+@attribute mometasona {0,1}
+@attribute montelukast {0,1}
+@attribute singulair {0,1}
+@attribute salmeterolfluticasona {0,1}
+@attribute formoterolbudesonida {0,1}
+@attribute omalizumab {0,1}
+@attribute FEV1 numeric
+@attribute FEF2575 numeric
+@attribute Fumadorsaldomicilihabitual {0,1}
+@attribute Medicacióderescat {0,1}
+@attribute Antecedentsfamiliarsdatòpia {0,1}
+@attribute Dispneanocturna {0,1}
+@attribute Immunoteràpia {0,1}
+@attribute Símptomésambesforç {0,1}
+
+@data
